@@ -1,6 +1,7 @@
 const dotenv = require("dotenv").config();
 const express = require('express');
 const userRoutes = require('./routes/User_route');
+const bookRoutes = require('./routes/Book_route');
 
 const mongoose = require('mongoose');
 
@@ -22,10 +23,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 app.use("/api/auth", userRoutes); 
-
-app.use('/api/books', (req, res, next) => {
-    const books = require('../frontend/public/data/data.json');
-    res.status(200).json(books);
-});
+app.use("/api/books", bookRoutes);
+app.use("/images", express.static("images"));
 
 module.exports = app;
