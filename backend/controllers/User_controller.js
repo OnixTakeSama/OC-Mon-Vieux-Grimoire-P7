@@ -3,6 +3,10 @@ const User = require('../models/User_model');
 const jwt = require('jsonwebtoken');
 const dotenv = require("dotenv").config();
 
+if (dotenv.error) {
+    throw new Error('Unable to load .env file')
+}
+
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
         .then(hash => {

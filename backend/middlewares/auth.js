@@ -1,10 +1,15 @@
 const jwt = require('jsonwebtoken')
+const dotenv = require("dotenv").config();
+if (dotenv.error) {
+    throw new Error('Unable to load .env file')
+}
 
 module.exports = (req, res, next) => {
     try {
         let userId;
         const token = req.headers.authorization.split(' ')[1]
-        const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET', (err, decoded) => {
+        console.log("token:", token, typeof token);
+        const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err, decoded) => {
             if (err !== null) {
                 throw err;
             }
