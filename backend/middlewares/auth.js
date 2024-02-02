@@ -7,14 +7,12 @@ if (dotenv.error) {
 module.exports = (req, res, next) => {
     try {
         let userId;
-        const token = req.headers.authorization.split(' ')[1]
-        console.log("token:", token, typeof token);
+        const token = req.headers.authorization.split(' ')[1];
         const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err, decoded) => {
             if (err !== null) {
                 throw err;
             }
             userId = decoded.userId;
-            console.log("userId:", userId)
         });
         if (req.body.userId && req.body.userId !== userId) {
             throw 'Invalid user ID';
