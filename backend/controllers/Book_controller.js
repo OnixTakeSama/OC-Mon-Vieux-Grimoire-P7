@@ -50,6 +50,11 @@ exports.modifyBook = (req, res, next) => {
             if ( book.userId !== req.auth.userId ) {
                 res.status(403).json({ message: '403: Unauthorized Request' });
             } else {
+                const oldImage = book.imageUrl.split('/images/')[1];
+                // Si une nouvelle image est envoyée, on supprime l'ancienne image des fichiers locaux
+                if (req.file) {
+                    fs.unlink(`images/${oldImage}`, () => {});
+                }
                 // On vérifie si une nouvelle image est envoyée
                 const bookObject = req.file ?
                     {
@@ -82,8 +87,8 @@ exports.rateBook = (req, res, next) => {
             const totalRating = ratings.reduce((acc, rating) => acc + rating.grade, 0);
             const averageRating = (totalRating / ratings.length).toFixed(1);
             // On met à jour le livre dans la BDD
-            Book.updateOne({ _id: req.params.id }, { ratings, averageRating, _id: req.params.id})
-                .then(() => res.status(200).json({ message: 'Livre noté !' }))
+            Book.findByIdAndUpdate({ _id: req.params.id }, { ratings, averageRating, _id: req.params.id }, { new: true })
+                .then(data => res.status(200).json(data))
                 .catch(error => res.status(400).json({ error }));
         })
 };

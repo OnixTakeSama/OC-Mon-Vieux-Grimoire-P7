@@ -1,25 +1,24 @@
-const sharp = require('sharp');
-const fs = require('fs');
+const sharp = require("sharp")
+const path = require('path')
 
-const resizeImage = (req, res, next) => {
+module.exports = (req, res, next) => {
+
+    console.log("req.file:", req.file)
     if (!req.file) {
-        return res.status(400).json({ error: 'Aucun fichier envoyé' });
+        next()
+        return
     }
 
-    sharp(req.file.path)
-        .resize(500, 500)
-        .toFormat('webp')
-        .toFile(`images/${req.file.filename}`, (err, info) => {
+    const { buffer, fieldname } = req.file;
+    const filename = `${fieldname}-${Date.now()}-${Math.round(Math.random() * 1E9)}.webp`;
+    sharp(buffer)
+        .webp()
+        .toFile(path.resolve(__dirname, `../images/${filename}`), (err, info) => {
+            console.log(err || info)
             if (err) {
-                return res.status(500).json({ error: 'Erreur lors du traitement de l\'image' });
+                return res.status(400).json({ error: err })
             }
-            fs.unlink(req.file.path, (unlinkErr) => {
-                if (unlinkErr) {
-                    console.error('Erreur lors de la suppression du fichier d\'origine', unlinkErr);
-                }
-                next();
-            });
-        });
-};
-
-module.exports = resizeImage;
+            req.file.filename = filename
+            next()
+        })
+}
