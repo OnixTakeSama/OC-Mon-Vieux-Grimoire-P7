@@ -4,10 +4,14 @@ const userRoutes = require('./routes/User_route');
 const bookRoutes = require('./routes/Book_route');
 
 const mongoose = require('mongoose');
+const username = process.env.DB_USERNAME;
+const password = process.env.DB_PASSWORD;
+const cluster = process.env.DB_CLUSTER;
+const connectionString = `mongodb+srv://${username}:${password}@${cluster}.gjwjxds.mongodb.net/?retryWrites=true&w=majority`;
 
 const app = express();
 
-mongoose.connect(process.env.CONNECTION_STRING,
+mongoose.connect(connectionString,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
