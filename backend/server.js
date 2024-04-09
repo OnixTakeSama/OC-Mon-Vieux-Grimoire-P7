@@ -1,6 +1,7 @@
 const http = require('http');
 const app = require('./app');
-const https = require('https')
+const https = require('https');
+const fs = require('fs');
 
 const normalizePort = val => {
   const port = parseInt(val, 10);
