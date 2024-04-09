@@ -1,11 +1,11 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User_model');
 const jwt = require('jsonwebtoken');
-const dotenv = require("dotenv").config();
+// const dotenv = require("dotenv").config();
 
-if (dotenv.error) {
-    throw new Error('Unable to load .env file')
-}
+// if (dotenv.error) {
+//     throw new Error('Unable to load .env file')
+// }
 
 // Fonction pour vérifier si l'email est valide
 function isValideEmail(email) {

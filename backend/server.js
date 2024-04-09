@@ -1,5 +1,6 @@
 const http = require('http');
 const app = require('./app');
+const https = require('https')
 
 const normalizePort = val => {
   const port = parseInt(val, 10);
@@ -12,8 +13,9 @@ const normalizePort = val => {
   }
   return false;
 };
-const port = normalizePort(process.env.PORT || '3001');
+const port = normalizePort(process.env.PORT || '4000');
 app.set('port', port);
+
 
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
@@ -35,13 +37,37 @@ const errorHandler = error => {
   }
 };
 
-const server = http.createServer(app);
+// const server = http.createServer(app);
+
+// server.on('error', errorHandler);
+// server.on('listening', () => {
+//   const address = server.address();
+//   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
+//   console.log('Listening on ' + bind);
+// });
+
+const isHTTP = process.env.NODE_ENV !== 'prod'
+
+// const server = http.createServer(app);
+
+// start http or https server
+const server = isHTTP ?
+  // http config
+  http.createServer(app) :
+  // otherwise https config
+  https.createServer({
+    // options https://nodejs.org/api/tls.html#tls_tls_createsecurecontext_options
+    // https://itnext.io/node-express-letsencrypt-generate-a-free-ssl-certificate-and-run-an-https-server-in-5-minutes-a730fbe528ca
+    key: fs.readFileSync(path.resolve(`${process.env.LOCAL_PATH_CERTIFICAT}/privkey.pem`)),
+    cert: fs.readFileSync(path.resolve(`${process.env.LOCAL_PATH_CERTIFICAT}/cert.pem`)),
+    ca: fs.readFileSync(path.resolve(`${process.env.LOCAL_PATH_CERTIFICAT}/chain.pem`))
+  }, app)
 
 server.on('error', errorHandler);
 server.on('listening', () => {
   const address = server.address();
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
-  console.log('Listening on ' + bind);
+  console.log('Listening on ' + bind + ' - process.env.NODE_ENV:' + process.env.NODE_ENV);
 });
 
 server.listen(port);
