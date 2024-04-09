@@ -30,11 +30,13 @@ exports.createBook = (req, res, next) => {
     delete bookObject._id;
     delete bookObject._userID;
 
+    const PATH = process.env.NODE_ENV === 'dev' ? `${req.protocol}://${req.get('host')}` : `${process.env.API_PATH}`
+
     // On crée un nouvel objet Book avec les informations envoyées par le front-end
     const book = new Book({
         ...bookObject,
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        imageUrl: `${PATH}/images/${req.file.filename}`
     });
     // On enregistre le livre dans la BDD
     book.save()
@@ -47,19 +49,22 @@ exports.modifyBook = (req, res, next) => {
     Book.findOne({ _id: req.params.id })
         .then(book => {
             // On vérifie que l'utilisateur est bien le propriétaire du livre
-            if ( book.userId !== req.auth.userId ) {
+            if (book.userId !== req.auth.userId) {
                 res.status(403).json({ message: '403: Unauthorized Request' });
             } else {
                 const oldImage = book.imageUrl.split('/images/')[1];
                 // Si une nouvelle image est envoyée, on supprime l'ancienne image des fichiers locaux
                 if (req.file) {
-                    fs.unlink(`images/${oldImage}`, () => {});
+                    fs.unlink(`images/${oldImage}`, () => { });
                 }
+
+                const PATH = process.env.NODE_ENV === 'dev' ? `${req.protocol}://${req.get('host')}` : `${process.env.API_PATH}`
+
                 // On vérifie si une nouvelle image est envoyée
                 const bookObject = req.file ?
                     {
                         ...JSON.parse(req.body.book),
-                        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+                        imageUrl: `${PATH}/images/${req.file.filename}`
                     } : { ...req.body };
                 // On met à jour le livre dans la BDD
                 Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id })
@@ -98,7 +103,7 @@ exports.deleteBook = (req, res, next) => {
     Book.findOne({ _id: req.params.id })
         .then(book => {
             // On vérifie que l'utilisateur est bien le propriétaire du livre
-            if ( book.userId !== req.auth.userId ) {
+            if (book.userId !== req.auth.userId) {
                 // Si ce n'est pas le cas, on renvoie une erreur 403
                 res.status(403).json({ message: '403: Unauthorized Request' });
             } else {

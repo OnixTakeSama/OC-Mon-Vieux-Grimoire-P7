@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken')
-const dotenv = require("dotenv").config();
-if (dotenv.error) {
-    throw new Error('Unable to load .env file')
-}
+// const dotenv = require("dotenv").config();
+// if (dotenv.error) {
+//     throw new Error('Unable to load .env file')
+// }
 
 module.exports = (req, res, next) => {
     try {
